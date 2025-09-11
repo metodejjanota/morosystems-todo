@@ -4,6 +4,7 @@ import type { RootState, AppDispatch } from "./store/store";
 import { fetchTodos } from "./store/todosSlice";
 import TodoComp from "./components/ui/todo";
 import { Skeleton } from "./components/ui/skeleton";
+import CreateTaskDialog from "./components/blocks/addTodoForm";
 
 function App() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +21,9 @@ function App() {
 	return (
 		<div>
 			<h1 className="text-5xl font-bold text-center">Morosystems To-Do</h1>
+			<div className="flex justify-center mt-10">
+				<CreateTaskDialog />
+			</div>
 
 			<div className="flex justify-center items-center mt-10">
 				{loading && (

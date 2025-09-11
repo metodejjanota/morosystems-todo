@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+	createAsyncThunk,
+	createSlice,
+	type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { Task } from "../services/models";
 import { getTodos } from "../services/todos";
 
@@ -21,7 +25,11 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
 const todosSlice = createSlice({
 	name: "todos",
 	initialState,
-	reducers: {},
+	reducers: {
+		addTodoOptimistic: (state, action: PayloadAction<Task>) => {
+			state.items.push(action.payload);
+		},
+	},
 	extraReducers: builder => {
 		builder
 			.addCase(fetchTodos.pending, state => {
@@ -39,4 +47,5 @@ const todosSlice = createSlice({
 	},
 });
 
+export const { addTodoOptimistic } = todosSlice.actions;
 export default todosSlice.reducer;
