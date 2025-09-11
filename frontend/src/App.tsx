@@ -1,7 +1,10 @@
+import { Button } from "./components/ui/button";
+
 function App() {
 	return (
-		<div className="bg-red-600">
+		<div>
 			<p>swag</p>
+			<Button>Click me</Button>
 		</div>
 	);
 }
