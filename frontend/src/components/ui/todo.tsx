@@ -4,24 +4,51 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Task } from "@/services/models";
 import { completeTodo, incompleteTodo, deleteTodo } from "@/services/todos";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store/store";
+import { removeTodoOptimistic, updateTodoOptimistic } from "@/store/todosSlice";
 import { Trash } from "lucide-react";
 
 const TodoComp = ({ task }: { task: Task }) => {
 	const [completed, setCompleted] = useState(task.completed);
+	const dispatch = useDispatch<AppDispatch>();
 
 	const handleCheckboxChange = async () => {
+		const newCompleted = !completed;
+
+		setCompleted(newCompleted);
+		dispatch(
+			updateTodoOptimistic({
+				id: task.id,
+				completed: newCompleted,
+				text: task.text,
+				createdDate: 0,
+			})
+		);
+
 		try {
 			if (completed) {
-				await incompleteTodo(task.id).then(() => setCompleted(false));
+				await incompleteTodo(task.id);
 			} else {
-				await completeTodo(task.id).then(() => setCompleted(true));
+				await completeTodo(task.id);
 			}
 		} catch (error) {
+			setCompleted(completed);
+			dispatch(
+				updateTodoOptimistic({
+					id: task.id,
+					completed: completed,
+					text: task.text,
+					createdDate: 0,
+				})
+			);
 			console.error("Chyba při aktualizaci úkolu:", error);
 		}
 	};
 
 	const handleDelete = async (id: string) => {
+		dispatch(removeTodoOptimistic(id));
+
 		try {
 			await deleteTodo(id);
 		} catch (error) {

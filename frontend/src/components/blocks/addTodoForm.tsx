@@ -71,7 +71,7 @@ const CreateTaskDialog = () => {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline">
+				<Button variant="link" className="text-black" size={"input"}>
 					<Plus className="h-4 w-4" />
 					Přidat úkol
 				</Button>

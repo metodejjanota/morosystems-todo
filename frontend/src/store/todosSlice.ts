@@ -29,6 +29,17 @@ const todosSlice = createSlice({
 		addTodoOptimistic: (state, action: PayloadAction<Task>) => {
 			state.items.push(action.payload);
 		},
+		removeTodoOptimistic: (state, action: PayloadAction<string>) => {
+			state.items = state.items.filter(item => item.id !== action.payload);
+		},
+		updateTodoOptimistic: (state, action: PayloadAction<Task>) => {
+			const index = state.items.findIndex(
+				item => item.id === action.payload.id
+			);
+			if (index !== -1) {
+				state.items[index] = action.payload;
+			}
+		},
 	},
 	extraReducers: builder => {
 		builder
@@ -47,5 +58,6 @@ const todosSlice = createSlice({
 	},
 });
 
-export const { addTodoOptimistic } = todosSlice.actions;
+export const { addTodoOptimistic, removeTodoOptimistic, updateTodoOptimistic } =
+	todosSlice.actions;
 export default todosSlice.reducer;
