@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "./store/store";
 import { fetchTodos } from "./store/todosSlice";
 import { Loader2Icon } from "lucide-react";
+import TodoComp from "./components/ui/todo";
 
 function App() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -27,11 +28,11 @@ function App() {
 					<p>Žádné úkoly k zobrazení</p>
 				)}
 				{!loading && !error && (
-					<ul>
+					<div className="space-y-2">
 						{todos.map(todo => (
-							<li key={todo.id}>{todo.text}</li>
+							<TodoComp key={todo.id} task={todo} />
 						))}
-					</ul>
+					</div>
 				)}
 			</div>
 		</div>
