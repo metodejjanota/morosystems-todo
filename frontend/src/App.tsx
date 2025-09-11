@@ -16,6 +16,7 @@ function App() {
 	} = useSelector((state: RootState) => state.todos);
 
 	useEffect(() => {
+		document.title = "Morosystems To-Do";
 		dispatch(fetchTodos());
 	}, [dispatch]);
 
