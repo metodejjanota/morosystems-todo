@@ -3,8 +3,7 @@ import { Button } from "./components/ui/button";
 function App() {
 	return (
 		<div>
-			<p>swag</p>
-			<Button>Click me</Button>
+			<h1 className="text-5xl font-bold">Morosystems To-Do</h1>
 		</div>
 	);
 }
