@@ -28,7 +28,7 @@ function App() {
 					<p>Žádné úkoly k zobrazení</p>
 				)}
 				{!loading && !error && (
-					<div className="space-y-2">
+					<div className="space-y-2 w-full lg:w-1/2 mx-2">
 						{todos.map(todo => (
 							<TodoComp key={todo.id} task={todo} />
 						))}
