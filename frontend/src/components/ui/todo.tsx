@@ -32,6 +32,9 @@ const TodoComp = ({ task }: { task: Task }) => {
 	const handleCheckboxChange = async () => {
 		const newCompleted = !completed;
 		const newCompletedDate = newCompleted ? Date.now() : undefined;
+		const originalCompleted = completed;
+		const originalCompletedDate = task.completedDate;
+
 		setCompleted(newCompleted);
 		dispatch(
 			updateTodoOptimistic({
@@ -44,20 +47,20 @@ const TodoComp = ({ task }: { task: Task }) => {
 		);
 
 		try {
-			if (completed) {
+			if (originalCompleted) {
 				await incompleteTodo(task.id);
 			} else {
 				await completeTodo(task.id);
 			}
 		} catch (error) {
-			setCompleted(completed);
+			setCompleted(originalCompleted);
 			dispatch(
 				updateTodoOptimistic({
 					id: task.id,
-					completed: completed,
+					completed: originalCompleted,
 					text: task.text,
 					createdDate: task.createdDate,
-					completedDate: completed ? task.completedDate : undefined,
+					completedDate: originalCompletedDate,
 				})
 			);
 			console.error("Chyba při aktualizaci úkolu:", error);
