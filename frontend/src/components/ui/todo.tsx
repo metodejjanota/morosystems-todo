@@ -16,7 +16,8 @@ import { removeTodoOptimistic, updateTodoOptimistic } from "@/store/todosSlice";
 import { Trash } from "lucide-react";
 
 const TodoComp = ({ task }: { task: Task }) => {
-	const [completed, setCompleted] = useState(task.completed);
+	const completed = task.completed;
+
 	const [isEditing, setIsEditing] = useState(false);
 	const [editText, setEditText] = useState(task.text);
 	const dispatch = useDispatch<AppDispatch>();
@@ -29,50 +30,12 @@ const TodoComp = ({ task }: { task: Task }) => {
 		}
 	}, [isEditing]);
 
-	const handleCheckboxChange = async () => {
-		const newCompleted = !completed;
-		const newCompletedDate = newCompleted ? Date.now() : undefined;
-		const originalCompleted = completed;
-		const originalCompletedDate = task.completedDate;
-
-		setCompleted(newCompleted);
-		dispatch(
-			updateTodoOptimistic({
-				id: task.id,
-				completed: newCompleted,
-				text: task.text,
-				createdDate: task.createdDate,
-				completedDate: newCompletedDate,
-			})
-		);
-
-		try {
-			if (originalCompleted) {
-				await incompleteTodo(task.id);
-			} else {
-				await completeTodo(task.id);
-			}
-		} catch (error) {
-			setCompleted(originalCompleted);
-			dispatch(
-				updateTodoOptimistic({
-					id: task.id,
-					completed: originalCompleted,
-					text: task.text,
-					createdDate: task.createdDate,
-					completedDate: originalCompletedDate,
-				})
-			);
-			console.error("Chyba při aktualizaci úkolu:", error);
-		}
-	};
-
 	const handleDelete = async (id: string) => {
 		dispatch(removeTodoOptimistic(id));
 		try {
 			await deleteTodo(id);
 		} catch (error) {
-			console.error("Chyba při mazání úkolu:", error);
+			console.error(error);
 		}
 	};
 
@@ -118,7 +81,7 @@ const TodoComp = ({ task }: { task: Task }) => {
 			);
 			setEditText(task.text);
 			setIsEditing(false);
-			console.error("Chyba při aktualizaci textu úkolu:", error);
+			console.error(error);
 		}
 	};
 
@@ -140,9 +103,24 @@ const TodoComp = ({ task }: { task: Task }) => {
 			<div className="flex items-center">
 				<div>
 					<Checkbox
-						checked={completed}
 						className="mr-4"
-						onCheckedChange={handleCheckboxChange}
+						checked={completed}
+						onCheckedChange={async () => {
+							const newCompleted = !completed;
+							dispatch(
+								updateTodoOptimistic({
+									...task,
+									completed: newCompleted,
+									completedDate: newCompleted ? Date.now() : undefined,
+								})
+							);
+							try {
+								if (completed) await incompleteTodo(task.id);
+								else await completeTodo(task.id);
+							} catch (err) {
+								console.error(err);
+							}
+						}}
 					/>
 				</div>
 				<div className="flex-1">

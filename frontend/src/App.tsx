@@ -8,6 +8,8 @@ import CreateTaskDialog from "./components/blocks/addTodoForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "./components/ui/checkbox";
 import { CheckSquare2, Trash } from "lucide-react";
+import { updateTodoOptimistic, removeTodoOptimistic } from "./store/todosSlice";
+import { completeTodo, incompleteTodo, deleteTodo } from "./services/todos";
 
 function App() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -22,13 +24,62 @@ function App() {
 		dispatch(fetchTodos());
 	}, [dispatch]);
 
-	const handleCheckEvery = async () => {};
+	const handleCheckEvery = async () => {
+		try {
+			for (const todo of todos.filter(t => !t.completed)) {
+				dispatch(
+					updateTodoOptimistic({
+						...todo,
+						completed: true,
+						completedDate: Date.now(),
+					})
+				);
+				await completeTodo(todo.id);
+			}
+		} catch (error) {
+			console.error(error);
+			dispatch(fetchTodos());
+		}
+	};
 
-	const handleUncheckEvery = async () => {};
+	const handleUncheckEvery = async () => {
+		try {
+			for (const todo of todos.filter(t => t.completed)) {
+				dispatch(
+					updateTodoOptimistic({
+						...todo,
+						completed: false,
+						completedDate: undefined,
+					})
+				);
+				await incompleteTodo(todo.id);
+			}
+		} catch (error) {
+			console.error(error);
+			dispatch(fetchTodos());
+		}
+	};
 
 	const handleDeleteEvery = async (
 		type: "all" | "completed" | "incomplete"
-	) => {};
+	) => {
+		try {
+			const toDelete =
+				type === "all"
+					? todos
+					: type === "completed"
+					? todos.filter(t => t.completed)
+					: todos.filter(t => !t.completed);
+
+			for (const todo of toDelete) {
+				dispatch(removeTodoOptimistic(todo.id));
+				await deleteTodo(todo.id);
+			}
+		} catch (error) {
+			console.error(error);
+			dispatch(fetchTodos());
+		}
+	};
 
 	return (
 		<div>
@@ -65,8 +116,13 @@ function App() {
 								<div className="space-y-2 w-full lg:w-1/2 mx-2">
 									<div className="flex mx-4 mb-2 items-center gap-4 justify-between">
 										<Checkbox
-											onCheckedChange={handleCheckEvery}
+											onCheckedChange={
+												todos.every(todo => todo.completed)
+													? handleUncheckEvery
+													: handleCheckEvery
+											}
 											className="cursor-pointer"
+											checked={todos.every(todo => todo.completed)}
 										/>
 
 										<label className="select-none flex gap-1 items-center">
